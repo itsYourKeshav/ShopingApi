@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopingApi.EFCore;
 using ShopingApi.Model;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -36,28 +37,74 @@ namespace ShopingApi.Controllers
         }
 
         // GET api/<ShoppingApiController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet]
+        [Route("api/[controller]/GetProductById/{id}")]
+        public IActionResult Get(int id)
         {
-            return "value";
+            ResponseType type = ResponseType.Success;
+            try
+            {
+                ProductModel data = _db.GetProductById(id);
+                if (data == null)
+                {
+                    type = ResponseType.NotFound;
+                }
+                return Ok(ResponseHandler.GetAppResponse(type, data));
+            }
+            catch (Exception ex)
+            {
+                type = ResponseType.Faliure;
+                return BadRequest(ResponseHandler.GetExceptionResponse(ex));
+            }
         }
 
         // POST api/<ShoppingApiController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        [Route("api/[controller]/SaveOrder")]
+        public IActionResult Post([FromBody] OrderModel model)
         {
+            ResponseType type = ResponseType.Success;
+            try {
+                _db.SaveOrder(model);
+                return Ok(ResponseHandler.GetAppResponse(type, model));
+            }
+            catch(Exception ex) {
+                return BadRequest(ResponseHandler.GetExceptionResponse(ex));
+            }
         }
 
         // PUT api/<ShoppingApiController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        [Route("api/[controller]/UpdateOrder")]
+        public IActionResult Put([FromBody] OrderModel model)
         {
+            ResponseType type = ResponseType.Success;
+            try
+            {
+                _db.SaveOrder(model);
+                return Ok(ResponseHandler.GetAppResponse(type, model));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseHandler.GetExceptionResponse(ex));
+            }
         }
 
         // DELETE api/<ShoppingApiController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete]
+        [Route("api/[controller]/DeleteOrder/{id}")]
+        public IActionResult Delete(int id)
         {
+            ResponseType type = ResponseType.Success;
+            try
+            {
+                _db.DeleteOrder(id);
+                return Ok(ResponseHandler.GetAppResponse(type, "Delete successfully"));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ResponseHandler.GetExceptionResponse(ex));
+            }
         }
     }
 }
